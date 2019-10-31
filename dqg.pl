@@ -12,7 +12,7 @@ $waytouse = << "end_usage";
                                   dqg.pl (Dynamic Query Generator) script.
 
 
-Author: Smruti P Mohanty (2spmmohanty at gmail dot com )
+Author: Smruti P Mohanty (2spmohanty at gmail dot com )
                          
 ==========================================       Usage        ======================================
 
