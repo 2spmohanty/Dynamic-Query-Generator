@@ -6,11 +6,13 @@ use Carp qw/croak carp/;
 use POSIX 'strftime';
 use Getopt::Long qw(GetOptions);
 
-$waytouse = << "end_usage";
+
+$waytouse = << "end_usage";
 
                                   dqg.pl (Dynamic Query Generator) script.
 
-Author: Smruti P Mohanty (smruti.mohanty\@hp.com. )
+
+Author: Smruti P Mohanty (2spmmohanty at gmail dot com )
                          
 ==========================================       Usage        ======================================
 
@@ -27,11 +29,13 @@ use Getopt::Long qw(GetOptions);
 to value given for n.
 ./dqg.pl -t 'dqg.dqg.table_name' -n 10 -p sample_project_file [-o sample_output_filename]
 
-(2)Case 2 when Table name is 'dqg.dqg.table_name' and a ''sample_predicate_file'' is given as the predicate.
+
+(2)Case 2 when Table name is 'dqg.dqg.table_name' and a ''sample_predicate_file'' is given as the predicate.
 ./dqg.pl -t 'dqg.dqg.table_name' -p sample_project_file -w sample_predicate_file [-o sample_output_filename]
 *** When sample_predicate_file is given [-n num_of_columns] option is ignored.
 
-(3)Case 3 when Table name is 'dqg.dqg.table_name' and -r is set to 1.
+
+(3)Case 3 when Table name is 'dqg.dqg.table_name' and -r is set to 1.
 ./dqg.pl -r 1 'dqg.dqg.table_name' -p sample_project_file [-o sample_output_filename]
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  End Use Cases ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -53,7 +57,8 @@ to value given for n.
           
 *********************************************************************************************************
 end_usage
-$myhome=`pwd`;
+
+$myhome=`pwd`;
 chomp $myhome;
 
 $line=undef;
@@ -64,7 +69,8 @@ $numofquery=0;
 @accessoption = ('READ UNCOMMITTED', 'READ COMMITTED', 'SERIALIZABLE', 'REPEATABLE READ', 'SKIP CONFLICT', 'STABLE');
 $dt = strftime '%d%M%S', localtime;
 
-$readmeta = 0;$tablename='default';
+$readmeta = 0;
+$tablename='default';
 $numcols=0;
 $projectionlist='default';
 $predicatelist='default';
@@ -73,7 +79,8 @@ $cqd_setting='default';
 $embsql=0;
 $outfilename = 'output';
 $divfile='default';
-GetOptions(
+
+GetOptions(
      'r=i' => \$readmeta,
      't=s' => \$tablename,
      'n=i' => \$numcols,
@@ -130,7 +137,8 @@ sub apply_cqd {
 		}
 }
 
-sub print_to_file {
+
+sub print_to_file {
 	@itemprint = @_;
 	
 	foreach $item(@itemprint){
@@ -151,11 +159,14 @@ sub apply_cqd {
 		}
 }
 
-if($tablename eq 'default' ){
+
+if($tablename eq 'default' ){
 		die "$waytouse \n";
 		}
-		############################################## Begin Case 1 ########################################
- elsif ($readmeta==0 && $tablename ne 'default' && $numcols != 0 && $projectionlist ne 'default' && $predicatelist eq 'default' && $embsql == 0){ # Begin of Case 1. Refer Way to use.
+		
+############################################## Begin Case 1 ########################################
+ 
+elsif ($readmeta==0 && $tablename ne 'default' && $numcols != 0 && $projectionlist ne 'default' && $predicatelist eq 'default' && $embsql == 0){ # Begin of Case 1. Refer Way to use.
  #  print "$tablename \n  $numcols \n $projectionlist \n"; # for debug only
  print "\n\nI am not reading from meta-data as option 'r' is not passed with a value greater than 0.\n\n";
  print "Dynamic Query Generated after reading projections options from $projectionlist file and randomly generated predicates.\n\n]I assumed that your predicate columns have name COL[i] where i <= n (number of columns)\n";
@@ -190,7 +201,8 @@ sub apply_cqd {
 				  
                   
                   
-                  $withequaloperator = << "equal_operator";
+                  
+$withequaloperator = << "equal_operator";
 select $line
 from $tablename
 where $pred1 = $pred2 $groupbyvar $orderbyvar
@@ -239,7 +251,8 @@ FOR $typeaccess ACCESS;
 lesserequal_operator
 
  print_to_file($withequaloperator,$withnotequaloperator,$greateroperator,$lesseroperator,$greaterequal,$lesserequal);
-			} #Closing the Access Option Loop.
+
+			} #Closing the Access Option Loop.
           } # Closing Number of Right Predicate column loop.
             
         } # Closing Number of Left Predicate column loop.
@@ -247,9 +260,11 @@ lesserequal_operator
    
 } # Closing Case 1 Logic.
 
-############################################## End Case 1 #########################################
 
-############################################## Begin Case 2 ########################################
+############################################## End Case 1 #########################################
+
+
+############################################## Begin Case 2 ########################################
 
 elsif ($readmeta==0 && $tablename ne 'default' && $projectionlist ne 'default' && $predicatelist ne 'default' && $embsql == 0){ #Begin case 2
 	open_file_write(); #Open files to write.
@@ -257,8 +272,10 @@ elsif ($readmeta==0 && $tablename ne 'default' && $projectionlist ne 'default' &
 print "\nI am not reading from meta-data as option 'r' is not passed with a value greater than 0.\n\n";
 print "Dynamic Query Generated after reading projections options from \'$projectionlist\' file and \npredicate options from \'$predicatelist\' file.";
         
-        	apply_cqd(); #calling cqd module if applicable.
-                open $fh1 , "<" , $projectionlist or carp "Could not open '$projectionlist' for reading $!"; #open file handle to read projection list
+        
+	apply_cqd(); #calling cqd module if applicable.
+        
+        open $fh1 , "<" , $projectionlist or carp "Could not open '$projectionlist' for reading $!"; #open file handle to read projection list
 	
 	while($projectionitem = <$fh1>){ #Reading projection list line by line
 		$line = $projectionitem;
@@ -283,7 +300,8 @@ print "Dynamic Query Generated after reading projections options from \'$project
 						next if $predicateline =~/^$/;
 						@predicatearray = split(/:/,$predicateline); # Checking for AND, OR , ANY, SOME, IN OPTION
 						
-						if (scalar @predicatearray == 2){ # For And or OR option
+						
+if (scalar @predicatearray == 2){ # For And or OR option
 
 
 chomp $predicatearray[0];
@@ -401,33 +419,42 @@ else{
 
 ############################################## End Case 2 ########################################
 
-############################################## Begin Case3 ########################################
+
+############################################## Begin Case3 ########################################
 
 elsif ($readmeta==1 && $tablename ne 'default' && $projectionlist ne 'default' && $predicatelist eq 'default' && $embsql == 0){ #opening logic for reading metadata and forming queries without predicate file.
 
- print "\n\nI am reading from meta-data as option 'r' is set to 1.\n\n";
+
+ print "\n\nI am reading from meta-data as option 'r' is set to 1.\n\n";
  print "Generating Dynamic Query after reading projections options from \'$projectionlist\' file \nand randomly generated predicates with validation from table metadata.\n\n";
   
 system("echo \"showddl $tablename ;\" | mxci > dqgtemp ");
  
-	
+
+
+	
 	$meta_data ='dqgtemp';
 	
 	if (!(-e -s $meta_data )){
 		die "Issue while generating temporary copy of metadata file.\nQuitting dqg script.\n\n";
 		}
-        open $rdmt, "<", $meta_data or carp "Could not open $meta_data file for reading : \n$!"; # Reading output of metadata showddl command.
+
+
+        open $rdmt, "<", $meta_data or carp "Could not open $meta_data file for reading : \n$!"; # Reading output of metadata showddl command.
 	
-		@NUMB=();
+	
+	@NUMB=();
 	@CHARCT=();
 	@DAT=();
 	@TIM=();
 	@TSTAMP=();
 	@INTERYEAR=();
 	@INTERTIME=();
-		while($syntaxline = <$rdmt>){ #Segregating Column Types
+	
+	while($syntaxline = <$rdmt>){ #Segregating Column Types
 	        next if $syntaxline =~/^$/;
-	        chomp $syntaxline;                
+	        chomp $syntaxline;
+                
 		
 		if ($syntaxline =~m/\.*?ERROR.*/igm){
 			die "Please check the ddl of the table manually. I believe it contains some kind of ERRORS.\n";
@@ -461,7 +488,8 @@ system("echo \"showddl $tablename ;\" | mxci > dqgtemp ");
 		}
 		}#Closing #Segregating Column Types
 
-#************* Validation for Predicate''s Data Types if occuring only Once@onepredicate= ();
+#************* Validation for Predicate''s Data Types if occuring only Once
+@onepredicate= ();
 				 
   if(@NUMB == 1){ 
   	chomp $NUMB[0];
@@ -510,18 +538,22 @@ system("echo \"showddl $tablename ;\" | mxci > dqgtemp ");
   } # Closing of Validation if multiple occurence of NUM,INT,DECIMAL,DOUBLE,REAL, SMALLINT,LARGEINT 
  
  
- @multichar = ();
+ 
+@multichar = ();
  if(@CHARCT > 1){ #Validation if multiple occurence of CHAR, VARCHAR datatype.
  	for($i=0; $i < scalar @CHARCT ; $i++){
  		for($j=$i+1; $j < scalar @CHARCT; $j++){
  			push @multichar, "$CHARCT[$i] = $CHARCT[$j]";
  			push @multichar, "$CHARCT[$i] <> $CHARCT[$j]"; 			
- 						}
- 				}
+ 			
+			}
+ 		
+		}
  	 
  	}# Closing of Validation if multiple occurence of CHAR, VARCHAR datatype.
  	
- 	@multidat=();
+ 	
+@multidat=();
  if(@DAT > 1){#Validation if multiple occurence of DATE
  	for($i=0; $i < scalar @DAT ; $i++){
 		for($j=$i+1; $j < scalar @DAT; $j++){
@@ -530,10 +562,12 @@ system("echo \"showddl $tablename ;\" | mxci > dqgtemp ");
 			push @multidat, "$DAT[$i] > $DAT[$j]";
 			push @multidat, "$DAT[$i] <> $DAT[$j]";
 			}
-		 }			}#Closing Validation if multiple occurence of DATE
+		 }		
+	}#Closing Validation if multiple occurence of DATE
 
 
-@multitim = ();
+
+@multitim = ();
 if(@TIM > 1){#Validation if multiple occurence of TIME
 	for($i=0; $i < scalar @TIM ; $i++){
 		for($j=$i+1; $j < scalar @TIM; $j++){
@@ -545,7 +579,8 @@ if(@TIM > 1){#Validation if multiple occurence of TIME
 		}
 	}#Closing Validation if multiple occurence of TIME
 	
-	@multitstamp = ();
+	
+@multitstamp = ();
 if(@TSTAMP > 1){#Validation if multiple occurence of TIMESTAMP
 	for($i=0; $i < scalar @TSTAMP ; $i++){
 		for($j=$i+1; $j < scalar @TSTAMP; $j++){
@@ -557,7 +592,8 @@ if(@TSTAMP > 1){#Validation if multiple occurence of TIMESTAMP
 		}
 	}#Closing Validation if multiple occurence of TIMESTAMP
 	
-	@multintryr = ();
+	
+@multintryr = ();
 if(@INTERYEAR > 1){#Validation if multiple occurence of INTERVAL YEAR, INTERVAL MONTH
 	for($i=0; $i < scalar @INTERYEAR ; $i++){
 		for($j=$i+1; $j < scalar @INTERYEAR; $j++){
@@ -570,7 +606,8 @@ if(@INTERYEAR > 1){#Validation if multiple occurence of INTERVAL YEAR, INTERVAL 
 	}#Closing Validation if multiple occurence of INTERVAL YEAR, INTERVAL MONTH
 	
 
-@multintrtim = ();
+
+@multintrtim = ();
 if(@INTERTIME > 1){#Validation if multiple occurence of INTERVAL DAY,INTERVAL HOUR,INTERVAL MINUTE,INTERVAL SECOND
 	for($i=0; $i < scalar @INTERTIME ; $i++){
 		for($j=$i+1; $j < scalar @INTERTIME; $j++){
@@ -581,19 +618,24 @@ if(@INTERTIME > 1){#Validation if multiple occurence of INTERVAL DAY,INTERVAL HO
 			}
 		}
 	}#Closing Validation if multiple occurence of TIMESTAMP	
-	@multiple_predicate = (@multinum,@multichar,@multidat,@multitim,@multitstamp,@multintryr,@multintrtim);
+	
+@multiple_predicate = (@multinum,@multichar,@multidat,@multitim,@multitstamp,@multintryr,@multintrtim);
 
 #************* End of Validation when each data type is occuring multiple times.
 
- open_file_write();  		
+
+ open_file_write();  
+		
  apply_cqd();
 		
  open $fh1 , "<" , $projectionlist or carp "Could not open '$projectionlist' for reading $!"; #open file handle to read projection list
 	
 #print "NUMB = @NUMB \n"	; # for debug only
 #print "DAT = @DAT \n"; # for debug only
-#print "CHARACTER = @CHARCT \n"; # for debug only        
-             while($projectionitem = <$fh1>){ # Opening Projection file for reading
+#print "CHARACTER = @CHARCT \n"; # for debug only
+        
+        
+     while($projectionitem = <$fh1>){ # Opening Projection file for reading
              
       $line = $projectionitem;
       chomp $line;
@@ -601,7 +643,8 @@ if(@INTERTIME > 1){#Validation if multiple occurence of INTERVAL DAY,INTERVAL HO
       $groupbyvar="";
       $orderbyvar="";        	
 	
-	      if($line=~m/.+?GROUP.*/i || $line=~m/.+?ORDER.*/i ){ #Checking if the query needs to have Order by and Group by clauses.
+	
+      if($line=~m/.+?GROUP.*/i || $line=~m/.+?ORDER.*/i ){ #Checking if the query needs to have Order by and Group by clauses.
          @testarr = split(/:/,$line);
          if (scalar @testarr == 3){
             ($line,$groupbyvar, $orderbyvar)=split(/:/,$line);
@@ -615,7 +658,8 @@ foreach(@accessoption){
 	$typeaccess = $_;
         chomp $typeaccess;
 
-  if(@onepredicate > 0) { #query formation on data types occuring once in the table. 
+  
+if(@onepredicate > 0) { #query formation on data types occuring once in the table. 
 	foreach $pred1(@onepredicate){
 $withnulloperator = << "null_operator";
 select $line
@@ -636,9 +680,12 @@ notnull_operator
 		
 print_to_file($withnulloperator,$withnotnulloperator);
 
-		         }#closing foreach onepredicate loop
+
+		
+         }#closing foreach onepredicate loop
 	
-  } #closing the query formation on data types occuring once in the table.      
+
+  } #closing the query formation on data types occuring once in the table.      
                   
 if(@multiple_predicate > 0){#opening query formation on multiple occurence of different data types.
       foreach $syntaxitem(@multiple_predicate){
@@ -655,7 +702,8 @@ end_of_syntax
 
 
 print_to_file($syntaxqueries);
-      	         }# Closing of foreach for multiple_predicate array.				
+      	         }# Closing of foreach for multiple_predicate array.
+				
 	    } # Closing query formation on multiple occurence of occurence of different data types.
 
          
@@ -666,7 +714,8 @@ print_to_file($syntaxqueries);
    }#closing projection file reading
    
 unlink $meta_data;
-}#closing logic for reading metadata and forming queries without predicate file.
+
+}#closing logic for reading metadata and forming queries without predicate file.
 
 ############################################## End Case 3 ########################################
 else{
@@ -685,7 +734,8 @@ sub countQuery {
 $lines = countQuery;
 $count = @$lines;
 $numofquery = $count*6;
-print "\n\n         A total of **** $numofquery **** queries were generated.\n\n";
+
+print "\n\n         A total of **** $numofquery **** queries were generated.\n\n";
 
 $outputfiles = << "END_OUTPUTFILE";
 
@@ -791,4 +841,5 @@ close $read_stable  or carp "Could not close '$outfile_stable' $!";
 
 
 
-################################################### End of Program ################################################
+
+################################################### End of Program ################################################
