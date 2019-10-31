@@ -52,7 +52,7 @@ Customers who wish to evaluate SQL/MX stability and performance can generate syn
 
 ```
 
-Use Cases
+### Use Cases
 
 (1)Case 1: When dqg.dqg.table_name Table has column named as COL[i] where i is an integer less than equal to value given for n.
 
